@@ -1,5 +1,6 @@
 const express = require("express");
 const { MongoClient } = require("mongodb");
+const ObjectId = require("mongodb").ObjectId;
 
 const cors = require("cors");
 require("dotenv").config();
@@ -17,6 +18,45 @@ const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
+
+async function run() {
+  try {
+    await client.connect();
+    // console.log("connected to database");
+    const database = client.db("car-gallery");
+    const productsCollection = database.collection("products");
+
+    //GET API
+    app.get("/products", async (req, res) => {
+      const cursor = productsCollection.find({});
+      const products = await cursor.toArray();
+      res.send(products);
+    });
+
+    //GET Single Product
+    app.get("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      console.log("getting specifing product", id);
+      const query = { _id: ObjectId(id) };
+      const product = await productsCollection.findOne(query);
+      res.json(product);
+    });
+
+    //POST API
+    app.post("/products", async (req, res) => {
+      const product = req.body;
+      console.log("hit the post api", product);
+
+      const result = await productsCollection.insertOne(product);
+      console.log(result);
+      res.json(result);
+    });
+  } finally {
+    // await client.close()
+  }
+}
+
+run().catch(console.dir);
 
 app.get("/", (req, res) => {
   res.send("Running Car Server");
