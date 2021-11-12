@@ -25,6 +25,8 @@ async function run() {
     // console.log("connected to database");
     const database = client.db("car-gallery");
     const productsCollection = database.collection("products");
+    const orderCollection = database.collection("orders");
+    const reviewCollection = database.collection("reviews");
 
     //GET API
     app.get("/products", async (req, res) => {
@@ -48,8 +50,80 @@ async function run() {
       console.log("hit the post api", product);
 
       const result = await productsCollection.insertOne(product);
+      // console.log(result);
+      res.json(result);
+    });
+
+    //DELETE Products API
+    app.delete("/deleteProducts/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await productsCollection.deleteOne(query);
+      res.json(result);
+    });
+
+    //Order POST API
+    app.post("/orders", async (req, res) => {
+      const order = req.body;
+      // console.log("hit the post api", camping);
+      const result = await orderCollection.insertOne(order);
       console.log(result);
       res.json(result);
+    });
+
+    //Order GET API
+    app.get("/orders", async (req, res) => {
+      const cursor = orderCollection.find({});
+      const order = await cursor.toArray();
+      res.send(order);
+    });
+
+    //DELETE orders API
+    app.delete("/deleteOrder/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await orderCollection.deleteOne(query);
+      res.json(result);
+    });
+
+    //Update Status API
+    app.patch("/updateStatus/:id", (req, res) => {
+      const id = ObjectId(req.params.id);
+      orderCollection
+        .updateOne(
+          { _id: id },
+          {
+            $set: { orderStatus: req.body.updateStatus },
+          }
+        )
+        .then((result) => {
+          // console.log(result);
+        });
+    });
+
+    //
+    app.get("orderEmail", (req, res) => {
+      orderCollection
+        .find({ email: req.query.email })
+        .toArray((err, documents) => {
+          res.send(documents);
+        });
+    });
+
+    //Review POST API
+    app.post("/reviwes", async (req, res) => {
+      const review = req.body;
+
+      const result = await reviewCollection.insertOne(review);
+      // console.log(result);
+      res.json(result);
+    });
+
+    //Review Get API
+    app.get("/reviwes", async (req, res) => {
+      const cursor = reviewCollection.find({});
+      const review = await cursor.toArray();
+      res.send(review);
     });
   } finally {
     // await client.close()
