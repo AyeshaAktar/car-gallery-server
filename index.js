@@ -27,6 +27,7 @@ async function run() {
     const productsCollection = database.collection("products");
     const orderCollection = database.collection("orders");
     const reviewCollection = database.collection("reviews");
+    const adminCollection = database.collection("admins");
 
     //GET API
     app.get("/products", async (req, res) => {
@@ -124,6 +125,21 @@ async function run() {
       const cursor = reviewCollection.find({});
       const review = await cursor.toArray();
       res.send(review);
+    });
+
+    //Admin POST API
+    app.post("/admin", async (req, res) => {
+      const admin = req.body;
+
+      const result = await adminCollection.insertOne(admin);
+      res.json(result);
+    });
+
+    //Admin Get API
+    app.get("/admin", async (req, res) => {
+      const cursor = adminCollection.find({});
+      const admin = await cursor.toArray();
+      res.send(admin);
     });
   } finally {
     // await client.close()
