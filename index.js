@@ -114,7 +114,7 @@ async function run() {
     //
 
     //Review POST API
-    app.post("/reviwes", async (req, res) => {
+    app.post("/reviews", async (req, res) => {
       const review = req.body;
 
       const result = await reviewCollection.insertOne(review);
@@ -123,7 +123,7 @@ async function run() {
     });
 
     //Review Get API
-    app.get("/reviwes", async (req, res) => {
+    app.get("/reviews", async (req, res) => {
       const cursor = reviewCollection.find({});
       const review = await cursor.toArray();
       res.send(review);
