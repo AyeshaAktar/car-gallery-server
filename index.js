@@ -66,7 +66,7 @@ async function run() {
     //Order POST API
     app.post("/orders", async (req, res) => {
       const order = req.body;
-      // console.log("hit the post api", camping);
+      console.log("hit the post api", order);
       const result = await orderCollection.insertOne(order);
       console.log(result);
       res.json(result);
@@ -77,6 +77,15 @@ async function run() {
       const cursor = orderCollection.find({});
       const order = await cursor.toArray();
       res.send(order);
+    });
+
+    //
+    app.get("/ordersEmail", (req, res) => {
+      orderCollection
+        .find({ email: req.query.email })
+        .toArray((err, documents) => {
+          res.send(documents);
+        });
     });
 
     //DELETE orders API
@@ -103,13 +112,6 @@ async function run() {
     });
 
     //
-    app.get("orderEmail", (req, res) => {
-      orderCollection
-        .find({ email: req.query.email })
-        .toArray((err, documents) => {
-          res.send(documents);
-        });
-    });
 
     //Review POST API
     app.post("/reviwes", async (req, res) => {
@@ -137,9 +139,9 @@ async function run() {
 
     //Admin Get API
     app.get("/admin", async (req, res) => {
-      const cursor = adminCollection.find({});
-      const admin = await cursor.toArray();
-      res.send(admin);
+      adminCollection.find({ email: req.query.email }).toArray((err, admin) => {
+        res.send(admin);
+      });
     });
   } finally {
     // await client.close()
